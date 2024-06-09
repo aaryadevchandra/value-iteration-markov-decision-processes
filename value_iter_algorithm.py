@@ -17,13 +17,26 @@ optimal_move_prob = 1 - noise
 suboptimal_move_prob = noise / 2
 living_reward = 0
 discount_factor = .9
-disallowed_x = [1, ]
-disallowed_y = [1, ]
+disallowed_x = []
+disallowed_y = []
 
+
+# needs to be defined before the algorithm is run
+# positions with +1 and -1 values
 terminal_x = [0, 1 ]
 terminal_y = [3, 3,]
 
 
+
+# define blocked cells
+for i in range(m.shape[0]):
+    for j in range(m.shape[1]):
+        # add to disallowed coordinates wherever -999 is found
+        if m[i, j] == -999:
+            disallowed_x.append(i)
+            disallowed_y.append(j)
+            
+# number of iterations for converging grid values
 iterations = 100
 
 
@@ -34,7 +47,7 @@ for _ in range(iterations):
             if i in terminal_x and j in terminal_y:
                 continue
             
-            print(f'i={i}, j={j}')
+            # print(f'i={i}, j={j}')
 
             # print(f'top {i - 1}, {j}')
             # print(f'down {i + 1}, {j}')
@@ -108,7 +121,7 @@ for _ in range(iterations):
             
             V = living_reward + discount_factor * np.max(direction_rewards)
             
-            print(V)
+            # print(V)
                     
             # print('\n\n')
             # print(f'Top {top}')
