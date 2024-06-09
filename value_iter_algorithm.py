@@ -23,10 +23,7 @@ disallowed_y = []
 
 # needs to be defined before the algorithm is run
 # positions with +1 and -1 values
-terminal_x = [0, 1 ]
-terminal_y = [3, 3,]
-
-
+terminal_points = [[0, 3], [1, 3]]
 
 # define blocked cells
 for i in range(m.shape[0]):
@@ -42,12 +39,16 @@ iterations = 100
 
 for _ in range(iterations):
     for i in range(m.shape[0]):
+        print('\n\n\n')
         for j in range(m.shape[1]):
 
-            if i in terminal_x and j in terminal_y:
+            if [i, j] in terminal_points:
                 continue
             
-            # print(f'i={i}, j={j}')
+            if i in disallowed_x and j in disallowed_y:
+                continue
+            
+            print(f'i={i}, j={j}')
 
             # print(f'top {i - 1}, {j}')
             # print(f'down {i + 1}, {j}')
@@ -121,7 +122,7 @@ for _ in range(iterations):
             
             V = living_reward + discount_factor * np.max(direction_rewards)
             
-            # print(V)
+            print(V)
                     
             # print('\n\n')
             # print(f'Top {top}')
