@@ -17,8 +17,8 @@ optimal_move_prob = 1 - noise
 suboptimal_move_prob = noise / 2
 living_reward = 0
 discount_factor = .9
-disallowed_x = []
-disallowed_y = []
+
+disallowed_coords = []
 
 
 # needs to be defined before the algorithm is run
@@ -30,32 +30,31 @@ for i in range(m.shape[0]):
     for j in range(m.shape[1]):
         # add to disallowed coordinates wherever -999 is found
         if m[i, j] == -999:
-            disallowed_x.append(i)
-            disallowed_y.append(j)
-            
+            # disallowed_x.append(i)
+            # disallowed_y.append(j)
+            disallowed_coords.append([i, j])
+
+
+
+disallowed_coords = np.array(disallowed_coords)
 # number of iterations for converging grid values
-iterations = 100
+iterations = 1000
 
 
 for _ in range(iterations):
+    # print(f'\n\n\n\nEPOCH {_ + 1}')
+    saved_values = {}
     for i in range(m.shape[0]):
-        print('\n\n\n')
         for j in range(m.shape[1]):
-
+            # print('\n\n')
+            # print(f'FOR i={i}, j={j}')
             if [i, j] in terminal_points:
+                # print(f'skipping for {i, j}')
                 continue
-            
-            if i in disallowed_x and j in disallowed_y:
-                continue
-            
-            print(f'i={i}, j={j}')
 
-            # print(f'top {i - 1}, {j}')
-            # print(f'down {i + 1}, {j}')
-            # print(f'right {i}, {j + 1}')
-            # print(f'left {i}, {j - 1}')
-            
-            
+            if any(np.array_equal(row, [i, j]) for row in disallowed_coords):
+                # print(f'skipping for {i, j}')
+                continue
             
             top_coord = [i - 1, j]
             down_coord = [i + 1, j]
@@ -74,44 +73,29 @@ for _ in range(iterations):
             if left_coord[1] < 0:
                 left_coord[1] = 0
             
-            
-            
-            
-            
-            
-            if top_coord[0] in disallowed_y:
-                top_coord[0] = i
-            
-            if down_coord[0] in disallowed_y:
-                down_coord[0] = i
-            
-            if right_coord[1] in disallowed_x:
-                right_coord[1] = j
-            
-            if left_coord[1] in disallowed_x:
-                left_coord[1] = j
-            
-            
             top = m[top_coord[0], top_coord[1]]
             down = m[down_coord[0], down_coord[1]]
             right = m[right_coord[0], right_coord[1]]
             left = m[left_coord[0], left_coord[1]]
+
+
+            if top == -999.0:
+                top = 0
+            
+            if down == -999.0:
+                down = 0
+            
+            if right == -999.0:
+                right = 0
+                
+            if left == -999.0:
+                left = 0
+                
             
             # for each cell, we go top down right left
             
-            
             direction_wise_state_rewards = [top, down, right, left]
-            
-            # top
-            
             noisy_moves = [right, left]
-            
-            
-            # print(living_reward + discount_factor * np.max([optimal_move_prob * top  + suboptimal_move_prob * left + suboptimal_move_prob * right],
-            # [optimal_move_prob * right + suboptimal_move_prob * top + suboptimal_move_prob * down],
-            # [optimal_move_prob * left + suboptimal_move_prob * top + suboptimal_move_prob * down],
-            # [optimal_move_prob * down + suboptimal_move_prob * right + suboptimal_move_prob * left]))
-            
             
             direction_rewards = np.array([[optimal_move_prob * top  + suboptimal_move_prob * left + suboptimal_move_prob * right],
             [optimal_move_prob * right + suboptimal_move_prob * top + suboptimal_move_prob * down],
@@ -122,23 +106,17 @@ for _ in range(iterations):
             
             V = living_reward + discount_factor * np.max(direction_rewards)
             
-            print(V)
-                    
-            # print('\n\n')
             # print(f'Top {top}')
             # print(f'Down {down}')
             # print(f'Right {right}')
             # print(f'Left {left}')
 
-            m[i, j] = V
+            saved_values[f'{i},{j}'] = V
+
+    # updating grid values once iteration is complete
+    for key in list(saved_values.keys()):
+        coords = key.split(',')
+        m[int(coords[0]), int(coords[1])] = saved_values[key]
             
-
-
-    # # get up down, right left state rewards
-    # i = 0
-    # j = 0
-
-
-
 
 print(f'Final converged grid values\n\n{m}')
