@@ -6,20 +6,20 @@ import random
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
-
-
+BLOCKAGE_NUMBER = -999
 block_size = 50
-
 max_width_len = int(WINDOW_WIDTH / block_size)
 max_height_len = int(WINDOW_HEIGHT / block_size)
+NUM_BLOCKAGES = 7
 
+# number of iterations for converging grid values
+iterations = 20
 
 print(f'max_width_len = {max_width_len}')
 print(f'max_height_len = {max_height_len}')
 
 
 
-NUM_BLOCKAGES = 7
 
 # ************************************************************************************************************************************ #
 
@@ -35,25 +35,20 @@ height_slice = int(max_height_len - 1 )
 m[0, max_width_len - 1] = 1
 m[1, max_width_len - 1] = -1
 
-# -999 defines a blocked grid cell
+# BLOCKAGE_NUMBER defines a blocked grid cell
 
-# for coord in random_blockages:
-#     m[int(coord[0]), int(coord[1])] = 
 
 random_blockages = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(NUM_BLOCKAGES)]
 
 print(f'Random blockages => {random_blockages}')
 
 for blocked_coord in random_blockages:
-    m[blocked_coord[0], blocked_coord[1]] = -999
+    m[blocked_coord[0], blocked_coord[1]] = BLOCKAGE_NUMBER
 
 print(m)
 
 
 # calculating value function
-
-
-
 noise = 0.2
 optimal_move_prob = 1 - noise
 suboptimal_move_prob = noise / 2
@@ -70,8 +65,8 @@ terminal_points = [[0, max_width_len - 1], [1, max_width_len - 1]]
 # define blocked cells
 for i in range(m.shape[0]):
     for j in range(m.shape[1]):
-        # add to disallowed coordinates wherever -999 is found
-        if m[i, j] == -999:
+        # add to disallowed coordinates wherever BLOCKAGE_NUMBER is found
+        if m[i, j] == BLOCKAGE_NUMBER:
             # disallowed_x.append(i)
             # disallowed_y.append(j)
             disallowed_coords.append([i, j])
@@ -79,10 +74,6 @@ for i in range(m.shape[0]):
 
 
 disallowed_coords = np.array(disallowed_coords)
-# number of iterations for converging grid values
-iterations = 20
-
-
 
 coord_direction_dict = {}
 
@@ -125,16 +116,16 @@ for _ in range(iterations):
             left = m[left_coord[0], left_coord[1]]
 
 
-            if top == -999.0:
+            if int(top) == int(BLOCKAGE_NUMBER):
                 top = 0
             
-            if down == -999.0:
+            if int(down) == int(BLOCKAGE_NUMBER):
                 down = 0
             
-            if right == -999.0:
+            if int(right) == int(BLOCKAGE_NUMBER):
                 right = 0
                 
-            if left == -999.0:
+            if int(left) == int(BLOCKAGE_NUMBER):
                 left = 0
                 
             
@@ -246,7 +237,7 @@ while running:
     for i in range(max_height_len):
         for j in range(max_width_len):
             if [i, j] not in terminal_points:
-                if int(m[i, j]) == -999:
+                if int(m[i, j]) == BLOCKAGE_NUMBER:
                     curr_mat_score = font_instance.render(str(m[i, j]), False, BLACK_COLOR)
                     surface.blit(curr_mat_score, dest=(j*block_size + 15, i*block_size + 15))
                 elif int(m[i, j]) == 1 or int(m[i, j]) == -1:
