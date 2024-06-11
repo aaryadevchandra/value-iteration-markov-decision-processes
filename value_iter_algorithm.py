@@ -2,6 +2,7 @@
 import pygame
 import numpy as np
 import random
+import time
 
 
 WINDOW_WIDTH = 800
@@ -76,6 +77,8 @@ for i in range(m.shape[0]):
 disallowed_coords = np.array(disallowed_coords)
 
 coord_direction_dict = {}
+
+m_iterations = []
 
 
 for _ in range(iterations):
@@ -167,6 +170,8 @@ for _ in range(iterations):
     for key in list(saved_values.keys()):
         coords = key.split(',')
         m[int(coords[0]), int(coords[1])] = saved_values[key]
+    
+    m_iterations.append(m.copy())
             
 
 print(f'\n\n\nFinal converged grid values\n{m}')
@@ -221,9 +226,14 @@ left_text = font_instance.render('left', False, BLACK_COLOR)
 terminal_points = [[15, 0], [15, 1]]
 
 
-while running:    
-    surface.fill(WHITE_COLOR)
+m_iter_var = 0
 
+scores_propagated = 0
+
+while running:
+    
+    m = m_iterations[m_iter_var]
+    surface.fill(WHITE_COLOR)
 
     # drawing grid
     drawGrid(surface, block_size)
@@ -233,6 +243,9 @@ while running:
     for coord in random_blockages:
         pygame.draw.rect(surface=surface, color=BLACK_COLOR, rect=pygame.Rect(block_size * coord[1], block_size * coord[0], block_size, block_size), width=0)
         
+        
+        
+    
     # drawing scores
     for i in range(max_height_len):
         for j in range(max_width_len):
@@ -244,20 +257,25 @@ while running:
                     curr_mat_score = font_instance.render("{:.2f}".format(m[i, j]), False, RED_COLOR)
                     surface.blit(curr_mat_score, dest=(j*block_size + 15, i*block_size + 15))
                     
+                else:
+                    if m_iter_var < 19:
+                        # drawing scores other than termnial and blockages, IF all iterations of scores propagating not shown
+                        # if all iterations of scores shown (iter var > 19) , show directions 
+                        curr_mat_score = font_instance.render("{:.2f}".format(m[i, j]), False, BLACK_COLOR)
+                        surface.blit(curr_mat_score, dest=(j*block_size + 15, i*block_size + 15))
+                    
     
     
-    # drawing direction values
-    for i in range(max_height_len):
-        for j in range(max_width_len):
-            if [i, j] not in terminal_points:
-                try:
-                    curr_mat_score = font_instance.render(coord_direction_dict[f'{i}, {j}'], False, BLACK_COLOR)
-                    surface.blit(curr_mat_score, dest=(j*block_size + 15, i*block_size + 15))
-                except:
-                    pass
-                
-                
-    
+    if m_iter_var == 19:
+        # drawing direction values
+        for i in range(max_height_len):
+            for j in range(max_width_len):
+                if [i, j] not in terminal_points:
+                    try:
+                        curr_mat_score = font_instance.render(coord_direction_dict[f'{i}, {j}'], False, BLACK_COLOR)
+                        surface.blit(curr_mat_score, dest=(j*block_size + 15, i*block_size + 15))
+                    except:
+                        pass
             
 
     for event in pygame.event.get():
@@ -266,9 +284,13 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
                 running = False
+    
 
-            
+    if m_iter_var < 19:
+        m_iter_var += 1            
+        time.sleep(0.5)
     pygame.display.flip()
+
             
 pygame.quit()
 
