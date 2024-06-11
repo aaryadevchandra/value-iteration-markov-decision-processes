@@ -5,7 +5,10 @@ m[0, 3] = 1
 m[1, 3] = -1
 
 # -999 defines a blocked grid cell
+
 m[1, 1] = -999
+
+print(m)
 
 
 # calculating value function
@@ -40,6 +43,9 @@ disallowed_coords = np.array(disallowed_coords)
 # number of iterations for converging grid values
 iterations = 1000
 
+
+
+coord_direction_dict = {}
 
 for _ in range(iterations):
     # print(f'\n\n\n\nEPOCH {_ + 1}')
@@ -104,6 +110,19 @@ for _ in range(iterations):
             
             # print(direction_rewards)
             
+            if np.argmax(direction_rewards) == 0:
+                coord_direction_dict[f'{i}, {j}'] = 'top'
+                
+            elif np.argmax(direction_rewards) == 1:
+                coord_direction_dict[f'{i}, {j}'] = 'right'
+                
+            elif np.argmax(direction_rewards) == 2:
+                coord_direction_dict[f'{i}, {j}'] = 'left'
+                
+            elif np.argmax(direction_rewards) == 3:
+                coord_direction_dict[f'{i}, {j}'] = 'down'
+            
+                
             V = living_reward + discount_factor * np.max(direction_rewards)
             
             # print(f'Top {top}')
@@ -120,3 +139,8 @@ for _ in range(iterations):
             
 
 print(f'Final converged grid values\n\n{m}')
+
+
+
+print(f'Coordinate-Direction Dictionary\n\n{coord_direction_dict}')
+
