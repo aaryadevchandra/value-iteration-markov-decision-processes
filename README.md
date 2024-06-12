@@ -16,7 +16,7 @@ To run this repo locally, follow these steps:
 ## Usage
 
 **Run the application**:
-    ```
+    ```bash
     python value_iter_algorithm.py
     ```
 
