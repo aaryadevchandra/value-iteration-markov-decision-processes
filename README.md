@@ -1,11 +1,11 @@
 ## Installation
 
-To run WeatherWizard locally, follow these steps:
+To run this repo locally, follow these steps:
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/weatherwizard.git
-    cd weatherwizard
+    git clone https://github.com/aaryadevchandra/value-iteration-markov-decision-processes.git
+    cd value-iteration-markov-decision-processes
     ```
 
 2. **Install dependencies**:
